@@ -17,7 +17,6 @@ class ServiceManager(object):
             self.logger.debug("Add .service extension to the unit name.")
             self.unitName = unitName + ".service"
         else:
-            print "IN"
             self.unitName = unitName
             
         self.sysbus = dbus.SystemBus()
@@ -74,25 +73,24 @@ class ThreadedServer(object):
                 state = False
                 self.logger.debug(obj)
 
-                if(obj.State == True):
-                    self.logger.info("State ON")
-                    self.serviceManager.start()
-                else:
-                    self.logger.info("State OFF")
-                    self.serviceManager.stop()
-
                 if(obj.GetState == True):
                     self.logger.info("Get State")
                     state = self.serviceManager.getState()
-
-                if(obj.Dimmer != 0xFF):
-                    self.logger.info("Dimmer OK")
+                    response = str(int(state == True))
+                    client.send(response)
                 else:
-                    self.logger.info("No Dimmer")
+                    if(obj.State == True):
+                        self.logger.info("State ON")
+                        self.serviceManager.start()
+                    else:
+                        self.logger.info("State OFF")
+                        self.serviceManager.stop()
 
-                # Set the response to echo back the recieved data 
-                response = str(int(state == True))
-                client.send(response)
+                        if(obj.Dimmer != 0xFF):
+                            self.logger.info("Dimmer OK")
+                        else:
+                            self.logger.info("No Dimmer")
+
             else:
                 raise error('Client disconnected')
 

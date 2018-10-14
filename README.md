@@ -6,16 +6,16 @@ TCP client/server managing systemd service
 Frame description
 
 ----------------------------------------------------------------
-|     bit     | 23             16|15           8|7            0|
+|     bit     |0 7|8 15|16 23|
 ----------------------------------------------------------------
-|  Variable   |        State     |   GetState   |    Dimmer    |
+|  Variable   |     GetState     |     State    |    Dimmer    |
 ----------------------------------------------------------------
 
-* State 
-  * 1: enable service, 
-  * O: disable service
 * GetState
   * 1: return service state, 
   * 0: not return service state 
+* State 
+  * 1: enable service, 
+  * O: disable service
 * Dimmer 
   * Value of the power to assign: 0 to 100, 255 if not used.
