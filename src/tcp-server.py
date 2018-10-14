@@ -14,7 +14,7 @@ class ServiceManager(object):
         self.logger = logging.getLogger("ServiceManager")
 
         if ".service" not in unitName:
-            self.logger.debug("Add .service extension to the unit name.")
+            self.logger.debug("Add \".service\" extension to the unit name.")
             self.unitName = unitName + ".service"
         else:
             self.unitName = unitName
@@ -86,10 +86,10 @@ class ThreadedServer(object):
                         self.logger.info("State OFF")
                         self.serviceManager.stop()
 
-                        if(obj.Dimmer != 0xFF):
-                            self.logger.info("Dimmer OK")
-                        else:
-                            self.logger.info("No Dimmer")
+                    if(obj.Dimmer != 0xFF):
+                        self.logger.info("Dimmer OK")
+                    else:
+                        self.logger.info("No Dimmer")
 
             else:
                 raise error('Client disconnected')
