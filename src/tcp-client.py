@@ -10,6 +10,7 @@ import socket
 import sys, getopt
 
 from message import FrameData
+from construct import *
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -26,92 +27,44 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logging.config.fileConfig("logging.conf")
+    logger = logging.getLogger("Main")
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((args.ip, args.port))
 
     # Initialize message
-    obj = FrameData.parse(data[:FrameData.sizeof()])
-    obj.GetState = False
-    obj.State = False
-    obj.Dimmer = 255
+    getState = False
+    state = False
+    dimmer = 255
 
     if(args.getState == True):
-        self.logger.info("Get State")
-        obj.GetState = True
+        logger.info("Get State")
+        getState = True
+        obj = FrameData.build(Container(GetState = getState, State = state, Dimmer = dimmer))
         s.send(obj)
-        data = s.recv(BUFFER_SIZE)
+        data = s.recv(sys.getsizeof(Byte))
 
-        #TODO process received frame
+        if(data == True):
+            print "true"
+        else:
+            print "false"
 
     else:
         # Process state
-        if(args.state == True): #TODO test if exist too !
-            self.logger.info("Send state ON")
-            obj.State = True
+        if(args.state == True):
+            logger.info("Send state ON")
+            state = True
         else:
-            self.logger.info("Send state OFF")
+            logger.info("Send state OFF")
 
         # Process dimmer
-        if (args.dimmer != 255):
-            self.logger.info("Send dimmer")
-            obj.Dimmer = args.dimmer
+        if args.dimmer is not None:
+            logger.info("Send dimmer")
+            dimmer = args.dimmer
         else:
-            self.logger.info("No dimmer")
+            logger.info("No dimmer")
 
+        obj = FrameData.build(Container(GetState = getState, State = state, Dimmer = dimmer))
         s.send(obj)
-        
-        
 
-"""
-TCP_IP = '192.168.22.101'
-TCP_PORT = 15333
-BUFFER_SIZE = 1024
-
-commands = {
-    'on'   : "1",
-    'off'  : "2",
-    'state': "3"
-}
-
-def main(argv):
-
-    command = ''
-
-    try:
-        opts, args = getopt.getopt(argv,"hc:",["command="])
-    except getopt.GetoptError:
-        print 'test.py -c <command>'
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print 'test.py -c <command>'
-            sys.exit()
-        elif opt in ("-c", "--command"):
-            command = arg
-
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((TCP_IP, TCP_PORT))
-   
-    if command == "on":
-        s.send(commands['on'])
-    elif command == "off":
-        s.send(commands['off'])
-    elif command == "state":
-
-        s.send(commands['state'])
-        data = s.recv(BUFFER_SIZE)
-        s.close()
-
-        if commands['on'] in data:
-            print 'true'
-        elif commands['off'] in data:
-            print 'false'
-
-    else:
-        print "wrong parameter : '" + command + "'."
-        print type(command)
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
-"""
+    s.close()
