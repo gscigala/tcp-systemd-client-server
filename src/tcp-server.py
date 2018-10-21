@@ -103,9 +103,12 @@ if __name__ == "__main__":
                         help="Port to listen")
     parser.add_argument("unitName", type=str,
                         help="Systemd service name")
+    parser.add_argument("--logconfig", type=str,
+                        default="/usr/local/share/tcp-systemd-client-server/logging.conf",
+                        help="Path of the log config")
     args = parser.parse_args()
 
-    logging.config.fileConfig("logging.conf")
+    logging.config.fileConfig(args.logconfig)
 
     serviceManager = ServiceManager(args.unitName)
     ThreadedServer('',args.port, serviceManager).listen()

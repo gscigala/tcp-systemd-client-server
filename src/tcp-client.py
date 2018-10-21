@@ -24,9 +24,12 @@ if __name__ == "__main__":
                         help="Set state of the device")
     parser.add_argument("--dimmer", type=int,
                         help="Set dimmer of the device")
+    parser.add_argument("--logconfig", type=str,
+                        default="/usr/local/share/tcp-systemd-client-server/logging.conf",
+                        help="Path of the log config")
     args = parser.parse_args()
 
-    logging.config.fileConfig("logging.conf")
+    logging.config.fileConfig(args.logconfig)
     logger = logging.getLogger("Main")
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,16 +41,16 @@ if __name__ == "__main__":
     dimmer = 255
 
     if(args.getState == True):
-        logger.info("Get State")
         getState = True
         obj = FrameData.build(Container(GetState = getState, State = state, Dimmer = dimmer))
         s.send(obj)
         data = s.recv(sys.getsizeof(Byte))
 
-        if(data == True):
-            print "true"
+        # Use stdout without logger for homebridge script2 compatibility
+        if(data == "1"):
+            print("Current state = ON")
         else:
-            print "false"
+            print("Current state = OFF")
 
     else:
         # Process state
